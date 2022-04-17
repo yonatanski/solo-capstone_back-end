@@ -6,6 +6,9 @@ import authRouter from "./services/routes/AuthRouter.js"
 import { badRequestHandler, unauthorizedHandler, forbiddenHandler, notFoundHandler, genericErrorHandler } from "./errorHandlers.js"
 import userRouter from "./services/routes/UserRouter.js"
 import productRouter from "./services/routes/ProductRouter.js"
+import orderRouter from "./services/routes/OrderRouter.js"
+import cartRouter from "./services/routes/CartRouter.js"
+import stripeRouter from "./services/routes/stripeRouter.js"
 
 const server = express()
 const port = process.env.PORT || 3002
@@ -17,13 +20,17 @@ server.use(express.json())
 server.use("/api/auth", authRouter)
 server.use("/api/users", userRouter)
 server.use("/api/products", productRouter)
+server.use("/api/orders", orderRouter)
+server.use("/api/carts", cartRouter)
+server.use("/api/checkout", stripeRouter)
+
 // ************************************* ERROR MIDDLEWARES ***************************************.
 
 server.use(badRequestHandler) //400
-server.use(unauthorizedHandler)//401
-server.use(forbiddenHandler)//403
-server.use(notFoundHandler)//404
-server.use(genericErrorHandler)//500
+server.use(unauthorizedHandler) //401
+server.use(forbiddenHandler) //403
+server.use(notFoundHandler) //404
+server.use(genericErrorHandler) //500
 
 mongoose.connect(process.env.MONGO_CONNECTION)
 
