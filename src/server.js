@@ -2,9 +2,10 @@ import express from "express"
 import listEndpoints from "express-list-endpoints"
 import cors from "cors"
 import mongoose from "mongoose"
-// import blogsRouter from "./services/Blogpost/index.js"
-// import authorsRouter from "./services/authors/index.js"
-import { unauthorizedHandler, catchAllHandler, forbiddenHandler, Notfound } from "./errorHandlers.js"
+import authRouter from "./services/routes/AuthRouter.js"
+import { badRequestHandler, unauthorizedHandler, forbiddenHandler, notFoundHandler, genericErrorHandler } from "./errorHandlers.js"
+import userRouter from "./services/routes/UserRouter.js"
+import productRouter from "./services/routes/ProductRouter.js"
 
 const server = express()
 const port = process.env.PORT || 3002
@@ -13,15 +14,16 @@ const port = process.env.PORT || 3002
 server.use(cors())
 server.use(express.json())
 // ************************************* ROUTES ********************************************
-// server.use("/blogposts", blogsRouter)
-// server.use("/authors", authorsRouter)
+server.use("/api/auth", authRouter)
+server.use("/api/users", userRouter)
+server.use("/api/products", productRouter)
 // ************************************* ERROR MIDDLEWARES ***************************************.
 
-server.use(unauthorizedHandler)
-server.use(forbiddenHandler)
-server.use(Notfound)
-
-server.use(catchAllHandler)
+server.use(badRequestHandler) //400
+server.use(unauthorizedHandler)//401
+server.use(forbiddenHandler)//403
+server.use(notFoundHandler)//404
+server.use(genericErrorHandler)//500
 
 mongoose.connect(process.env.MONGO_CONNECTION)
 
@@ -31,4 +33,8 @@ mongoose.connection.on("connected", () => {
     console.table(listEndpoints(server))
     console.log("Server runnning on port: ", port)
   })
+})
+
+server.on("error", (error) => {
+  console.log("Server is stopped due to error : " + error)
 })
