@@ -8,15 +8,12 @@ const userRouter = express.Router()
 
 // *********************************************** GET ALL LIKE ADMIN ***********************************************
 userRouter.get("/", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
+  const query = req.query.new
   try {
-    const allUser = await UserModel.find()
-
-    if (allUser) {
-      res.send(allUser)
-    } else {
-      next(createError(401, "Credentials are not ok!"))
-    }
+    const users = query ? await UserModel.find().sort({ _id: -1 }).limit(5) : await UserModel.find()
+    res.status(200).send(users)
   } catch (error) {
+    next(createError(401, "Credentials are not ok!"))
     next(error)
   }
 })
