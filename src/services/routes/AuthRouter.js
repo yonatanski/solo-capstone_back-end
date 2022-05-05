@@ -42,7 +42,7 @@ authRouter.post("/login", userLoginValidation, async (req, res, next) => {
         const accessToken = await authenticateUser(User)
         res.send({ User, accessToken })
       } else {
-        next(createError(401, "Credentials are not ok!"))
+        next(createHttpError(401, "Credentials are not ok!"))
       }
     } else {
       next(createHttpError(400, "wrong body!!", { errorsList }))

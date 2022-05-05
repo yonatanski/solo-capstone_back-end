@@ -8,6 +8,7 @@ const UserSchema = new Schema(
     email: { type: String, required: true, uniqe: true },
     password: { type: String, required: true, uniqe: true },
     isAdmin: { type: Boolean, default: false },
+    img: { type: String, default: "https://crowd-literature.eu/wp-content/uploads/2015/01/no-avatar.gif" },
   },
   {
     timestamps: true,

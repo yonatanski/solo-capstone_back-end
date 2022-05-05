@@ -34,6 +34,32 @@ userRouter.get("/me", JWTAuthMiddleware, async (req, res, next) => {
     next(error)
   }
 })
+//*********************************************** GET USER STATS LIKE ADMIN  ***********************************************
+userRouter.get("/stats", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
+  const date = new Date()
+  const lastYear = new Date(date.setFullYear(date.getFullYear() - 1)) // last year today
+  console.log(lastYear)
+
+  try {
+    const data = await UserModel.aggregate([
+      { $match: { createdAt: { $gte: lastYear } } },
+      {
+        $project: {
+          month: { $month: "$createdAt" },
+        },
+      },
+      {
+        $group: {
+          _id: "$month",
+          total: { $sum: 1 },
+        },
+      },
+    ])
+    res.status(200).send(data)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
 //*********************************************** GET with id LIKE ADMIN  ***********************************************
 userRouter.get("/:userId", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
@@ -53,6 +79,7 @@ userRouter.put("/me", JWTAuthMiddleware, async (req, res, next) => {
     next(error)
   }
 })
+
 //*********************************************** PUT with id LIKE ADMIN  ***********************************************
 userRouter.put("/:userId", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
@@ -89,4 +116,5 @@ userRouter.delete("/:userId", JWTAuthMiddleware, adminOnlyMiddleware, async (req
     next(error)
   }
 })
+
 export default userRouter
