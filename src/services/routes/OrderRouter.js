@@ -22,7 +22,7 @@ orderRouter.post("/admin", orderValidation, JWTAuthMiddleware, async (req, res, 
       if (createdOrder) {
         res.send(createdOrder)
       } else {
-        next(createError(401, "Credentials are not ok!"))
+        next(createHttpError(401, "Credentials are not ok!"))
       }
     } else {
       next(createHttpError(400, "wrong body!!", { errorsList }))
@@ -36,6 +36,18 @@ orderRouter.post("/admin", orderValidation, JWTAuthMiddleware, async (req, res, 
 orderRouter.get("/find/:userId", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const order = await OrderModel.find({ userId: req.params.userId })
+    if (order) {
+      res.status(200).send(order)
+    } else {
+      next(createError(404, "ORDER NOT FOUND!"))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+orderRouter.get("/:orderId", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    const order = await OrderModel.find({ _id: req.params.orderId })
     if (order) {
       res.status(200).send(order)
     } else {
@@ -60,13 +72,21 @@ orderRouter.get("/", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, ne
 })
 // *********************************************** GET INCOME as ADMIN  ***********************************************
 orderRouter.get("/income", JWTAuthMiddleware, async (req, res, next) => {
+  const productId = req.query.productId
   const date = new Date()
   const lastMonth = new Date(date.setMonth(date.getMonth() - 1))
   const previousMonth = new Date(new Date().setMonth(lastMonth.getMonth() - 1))
 
   try {
     const income = await OrderModel.aggregate([
-      { $match: { createdAt: { $gte: previousMonth } } },
+      {
+        $match: {
+          createdAt: { $gte: previousMonth },
+          ...(productId && {
+            products: { $elemMatch: { productId } },
+          }),
+        },
+      },
       {
         $project: {
           month: { $month: "$createdAt" },
@@ -88,7 +108,7 @@ orderRouter.get("/income", JWTAuthMiddleware, async (req, res, next) => {
 
 orderRouter.put("/:orderId", JWTAuthMiddleware, adminOnlyMiddleware, async (req, res, next) => {
   try {
-    const updatedOrder = await Order.findByIdAndUpdate(
+    const updatedOrder = await OrderModel.findByIdAndUpdate(
       req.params.orderId,
       {
         $set: req.body,

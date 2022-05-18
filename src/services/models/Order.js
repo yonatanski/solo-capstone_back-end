@@ -4,12 +4,11 @@ const { Schema, model } = mongoose
 const OrderSchema = new Schema(
   {
     userId: { type: String, required: true, uniqe: true },
-    products: [
-      {
-        productId: { type: String, required: true },
-        quantity: { type: Number, default: 1 },
-      },
-    ],
+    products: {
+      type: Object,
+      required: true,
+    },
+
     amount: { type: Number, required: true },
     address: { type: Object, required: true },
     status: { type: String, default: "pending" },

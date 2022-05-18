@@ -9,6 +9,7 @@ import productRouter from "./services/routes/ProductRouter.js"
 import orderRouter from "./services/routes/OrderRouter.js"
 import cartRouter from "./services/routes/CartRouter.js"
 import stripeRouter from "./services/routes/stripeRouter.js"
+import anncounceRouter from "./services/routes/AnnounceRouter.js"
 
 const server = express()
 const port = process.env.PORT || 3002
@@ -23,6 +24,7 @@ server.use("/api/products", productRouter)
 server.use("/api/orders", orderRouter)
 server.use("/api/carts", cartRouter)
 server.use("/api/checkout", stripeRouter)
+server.use("/api/anncoucment", anncounceRouter)
 
 // ************************************* ERROR MIDDLEWARES ***************************************.
 
