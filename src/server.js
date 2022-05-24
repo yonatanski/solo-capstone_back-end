@@ -15,7 +15,17 @@ const server = express()
 const port = process.env.PORT || 3002
 
 // ************************************* MIDDLEWARES ***************************************.
-server.use(cors())
+
+const whiteListOrigins = [process.env.PROD_FE_URL, process.env.DEV_FE_URL]
+server.use(
+  cors({
+    origin: function (origin, next) {
+      if (!origin || whiteListOrigins.indexOf(origin) !== -1) next(null, true)
+      else next(new Error("cors error"))
+    },
+  })
+)
+// server.use(cors())
 server.use(express.json())
 // ************************************* ROUTES ********************************************
 server.use("/api/auth", authRouter)
@@ -34,7 +44,9 @@ server.use(forbiddenHandler) //403
 server.use(notFoundHandler) //404
 server.use(genericErrorHandler) //500
 
-mongoose.connect(process.env.MONGO_CONNECTION)
+const uri = process.env.MONGODB_URI
+
+mongoose.connect(uri || process.env.MONGO_CONNECTION)
 
 mongoose.connection.on("connected", () => {
   console.log("Successfully connected to Mongo!")
