@@ -3,20 +3,32 @@ import listEndpoints from "express-list-endpoints"
 import cors from "cors"
 import mongoose from "mongoose"
 import authRouter from "./services/routes/AuthRouter.js"
-import { badRequestHandler, unauthorizedHandler, forbiddenHandler, notFoundHandler, genericErrorHandler } from "./errorHandlers.js"
+import {
+  badRequestHandler,
+  unauthorizedHandler,
+  forbiddenHandler,
+  notFoundHandler,
+  genericErrorHandler,
+} from "./errorHandlers.js"
 import userRouter from "./services/routes/UserRouter.js"
 import productRouter from "./services/routes/ProductRouter.js"
 import orderRouter from "./services/routes/OrderRouter.js"
 import cartRouter from "./services/routes/CartRouter.js"
 import stripeRouter from "./services/routes/stripeRouter.js"
 import anncounceRouter from "./services/routes/AnnounceRouter.js"
+import InfoRouter from "./services/routes/InfoRouter.js"
 
 const server = express()
 const port = process.env.PORT || 3002
 
 // ************************************* MIDDLEWARES ***************************************.
 
-const whiteListOrigins = [process.env.PROD_FE_URL, process.env.PROD_ADMINFE_URL, process.env.DEV_FE_URL, process.env.DEV_FE_ADMIN_DASHBOARD_URL]
+const whiteListOrigins = [
+  process.env.PROD_FE_URL,
+  process.env.PROD_ADMINFE_URL,
+  process.env.DEV_FE_URL,
+  process.env.DEV_FE_ADMIN_DASHBOARD_URL,
+]
 server.use(
   cors({
     origin: function (origin, next) {
@@ -35,6 +47,7 @@ server.use("/api/orders", orderRouter)
 server.use("/api/carts", cartRouter)
 server.use("/api/checkout", stripeRouter)
 server.use("/api/anncoucment", anncounceRouter)
+server.use("/api/team-list", InfoRouter)
 
 // ************************************* ERROR MIDDLEWARES ***************************************.
 
